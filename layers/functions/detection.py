@@ -25,17 +25,16 @@ class Detect(Function):
         """
         Args:
             loc_data: (tensor) Loc preds from loc layers
-                Shape: [batch,num_priors*4]
+                Shape: [batch,num_priors,4]
             conf_data: (tensor) Shape: Conf preds from conf layers
-                Shape: [batch*num_priors,num_classes]
+                Shape: [batch,num_priors,num_classes]
             prior_data: (tensor) Prior boxes and variances from priorbox layers
-                Shape: [1,num_priors,4]
+                Shape: [num_priors,4]
         """
         num = loc_data.size(0)  # batch size
         num_priors = prior_data.size(0)
         output = torch.zeros(num, self.num_classes, self.top_k, 5)
-        conf_preds = conf_data.view(num, num_priors,
-                                    self.num_classes).transpose(2, 1)
+        conf_preds = conf_data.view(num, num_priors, self.num_classes).transpose(2, 1)
 
         # Decode predictions into bboxes.
         for i in range(num):
@@ -44,6 +43,8 @@ class Detect(Function):
             conf_scores = conf_preds[i].clone()
 
             for cl in range(1, self.num_classes):
+                #在进入nms前先进行conf_thresh的筛选，下面语句到nms前都是筛选的
+
                 c_mask = conf_scores[cl].gt(self.conf_thresh)
                 scores = conf_scores[cl][c_mask]
                 if scores.size(0) == 0:
