@@ -9,13 +9,6 @@ import os
 
 class SSD(nn.Module):
     """Single Shot Multibox Architecture
-    The network is composed of a base VGG network followed by the
-    added multibox conv layers.  Each multibox layer branches into
-        1) conv2d for class conf scores
-        2) conv2d for localization predictions
-        3) associated priorbox layer to produce default bounding
-           boxes specific to the layer's feature map size.
-    See: https://arxiv.org/pdf/1512.02325.pdf for more details.
 
     Args:
         phase: (string) Can be "test" or "train"
@@ -49,7 +42,6 @@ class SSD(nn.Module):
 
     def forward(self, x):
         """Applies network layers and ops on input image(s) x.
-
         Args:
             x: input image or batch of images. Shape: [batch,3,300,300].
 
